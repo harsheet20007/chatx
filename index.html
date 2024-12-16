@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumChat AI</title>
+    
+    <!-- Modern Font Integration -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Enhanced Icon Pack -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+    <style>
+        :root {
+            /* Enhanced Color Scheme */
+            --primary-dark: #0A1128;
+            --primary: #2D46B9;
+            --primary-light: #3F8CFF;
+            --secondary: #6C22A6;
+            --accent: #1AEBB6;
+            --background: #080B1A;
+            --surface: #111827;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --error: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
+            
+            /* Spacing System */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            
+            /* Typography Scale */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-md: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            
+            /* Animation Timing */
+            --transition-fast: 150ms;
+            --transition-normal: 250ms;
+            --transition-slow: 350ms;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: var(--space-lg);
+            margin: 0 auto;
+        }
+
+        .welcome-card {
+            background: linear-gradient(145deg, 
+                rgba(45, 70, 185, 0.1) 0%, 
+                rgba(108, 34, 166, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: var(--space-xl);
+            text-align: center;
+            transform: translateY(0);
+            transition: all var(--transition-normal) ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(63, 140, 255, 0.15);
+        }
+
+        .logo-container {
+            margin-bottom: var(--space-xl);
+        }
+
+        .logo {
+            font-size: var(--text-3xl);
+            font-weight: 700;
+            background: linear-gradient(135deg, 
+                var(--primary-light) 0%, 
+                var(--accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .feature-badges {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: var(--space-xl);
+        }
+
+        .feature-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 100px;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast) ease;
+        }
+
+        .feature-badge:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .feature-badge i {
+            color: var(--accent);
+        }
+
+        .welcome-text {
+            margin-bottom: var(--space-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .welcome-text h2 {
+            font-size: var(--text-2xl);
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .welcome-text p {
+            color: var(--text-secondary);
+            font-size: var(--text-md);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: var(--space-md) var(--space-xl);
+            border-radius: 12px;
+            font-size: var(--text-md);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            transition: all var(--transition-normal) ease;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, 
+                var(--primary) 0%, 
+                var(--secondary) 100%);
+            color: var(--text-primary);
+            box-shadow: 0 4px 20px rgba(45, 70, 185, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 70, 185, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-md);
+            }
+
+            .welcome-card {
+                padding: var(--space-lg);
+            }
+
+            .logo {
+                font-size: var(--text-2xl);
+            }
+
+            .feature-badges {
+                gap: var(--space-sm);
+            }
+
+            .feature-badge {
+                padding: var(--space-xs) var(--space-md);
+                font-size: var(--text-xs);
+            }
+
+            .welcome-text h2 {
+                font-size: var(--text-xl);
+            }
+
+            .welcome-text p {
+                font-size: var(--text-sm);
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-card">
+            <div class="logo-container">
+                <h1 class="logo">QuantumChat AI</h1>
+            </div>
+
+            <div class="feature-badges">
+                <div class="feature-badge">
+                    <i class="fas fa-robot"></i>
+                    AI Assistant
+                </div>
+                <div class="feature-badge">
+                    <i class="fas fa-microphone"></i>
+                    Voice Chat
+                </div>
+                <div class="feature-badge">
+                    <i class="fas fa-video"></i>
+                    Video Calls
+                </div>
+                <div class="feature-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    Secure
+                </div>
+            </div>
+
+            <div class="welcome-text">
+                <h2>Next-Gen Communication Platform</h2>
+                <p>Experience the future of communication with AI-powered features, crystal-clear voice calls, and seamless video conferencing.</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="createRoomBtn">
+                    <i class="fas fa-plus-circle"></i>
+                    Create Room
+                </button>
+                <button class="btn btn-secondary" id="joinRoomBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Join Room
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Firebase (we'll add this in Part 2)
+        document.addEventListener('DOMContentLoaded', () => {
+            const createRoomBtn = document.getElementById('createRoomBtn');
+            const joinRoomBtn = document.getElementById('joinRoomBtn');
+
+            createRoomBtn.addEventListener('click', () => {
+                // Will implement in Part 2
+                console.log('Create room clicked');
+            });
+
+            joinRoomBtn.addEventListener('click', () => {
+                // Will implement in Part 2
+                console.log('Join room clicked');
+            });
+        });
+        // config.js - Create this as a separate file
+        </script>
+    <!-- Add this in the head section of your HTML, after your existing meta tags -->
+    <head>
+        <!-- ... your existing head content ... -->
+    
+        <!-- Firebase SDKs -->
+        <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    </head>
+    
+    <!-- Add this just before your closing body tag -->
+    <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+        // Replace with your Firebase config
+        apiKey: "AIzaSyCgCQNQfEMNhHESdsWLdHoo_nmgJ6PJbl8",
+  authDomain: "coder-s-26394.firebaseapp.com",
+  databaseURL: "https://coder-s-26394-default-rtdb.firebaseio.com",
+  projectId: "coder-s-26394",
+  storageBucket: "coder-s-26394.appspot.com",
+  messagingSenderId: "908793958164",
+  appId: "1:908793958164:web:7ff3e7a3840716179ebc01",
+  measurementId: "G-JCZCBYQTZ5",
+    };
+    
+    class QuantumChatAI {
+        constructor() {
+            this.initializeFirebase();
+            this.initializeUI();
+            this.setupEventListeners();
+        }
+    
+        initializeFirebase() {
+            // Initialize Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            this.auth = firebase.auth();
+            this.db = firebase.database();
+            this.storage = firebase.storage();
+        }
+    
+        initializeUI() {
+            // Create chat container
+            this.chatContainer = document.createElement('div');
+            this.chatContainer.className = 'chat-container hidden';
+            document.querySelector('.container').appendChild(this.chatContainer);
+    
+            // Add chat interface HTML
+            this.chatContainer.innerHTML = `
+                <div class="chat-header">
+                    <div class="room-info">
+                        <h2 id="roomName">Room Name</h2>
+                        <span id="participantCount">0 participants</span>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="btn-icon" id="toggleAI">
+                            <i class="fas fa-robot"></i>
+                        </button>
+                        <button class="btn-icon" id="toggleVoice">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="btn-icon" id="toggleImageGen">
+                            <i class="fas fa-image"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chat-messages" id="messageContainer"></div>
+                <div class="chat-input-container">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Type a message... Use /ai for AI assistance, /img for image generation"
+                            rows="1"
+                        ></textarea>
+                        <div class="input-actions">
+                            <button class="btn-icon" id="emojiBtn">
+                                <i class="far fa-smile"></i>
+                            </button>
+                            <button class="btn-icon" id="attachBtn">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn-send" id="sendMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            `;
+    
+            // Add loading overlay
+            this.loadingOverlay = document.createElement('div');
+            this.loadingOverlay.className = 'loading-overlay hidden';
+            this.loadingOverlay.innerHTML = `
+                <div class="loader"></div>
+                <p>Processing...</p>
+            `;
+            document.body.appendChild(this.loadingOverlay);
+    
+            // Add styles
+            const styles = document.createElement('style');
+            styles.textContent = `
+                .chat-container {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: var(--surface);
+                    display: flex;
+                    flex-direction: column;
+                    opacity: 0;
+                    transform: translateY(20px);
+                    transition: all var(--transition-normal) ease;
+                }
+    
+                .chat-container.visible {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+    
+                .loading-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.8);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                }
+    
+                .loading-overlay.hidden {
+                    display: none;
+                }
+    
+                .loader {
+                    width: 48px;
+                    height: 48px;
+                    border: 5px solid var(--primary);
+                    border-bottom-color: transparent;
+                    border-radius: 50%;
+                    animation: rotation 1s linear infinite;
+                }
+    
+                @keyframes rotation {
+                    0% { transform: rotate(0deg) }
+                    100% { transform: rotate(360deg) }
+                }
+    
+                /* ... (previous styles remain the same) ... */
+            `;
+            document.head.appendChild(styles);
+        }
+    
+        setupEventListeners() {
+            // Get DOM elements
+            const createRoomBtn = document.getElementById('createRoomBtn');
+            const joinRoomBtn = document.getElementById('joinRoomBtn');
+            const messageInput = document.getElementById('messageInput');
+            const sendMessage = document.getElementById('sendMessage');
+    
+            // Event listeners
+            createRoomBtn.addEventListener('click', () => this.createRoom());
+            joinRoomBtn.addEventListener('click', () => this.joinRoom());
+            sendMessage.addEventListener('click', () => this.handleSendMessage());
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.handleSendMessage();
+                }
+            });
+        }
+    
+        async queryAI(prompt) {
+            this.showLoading();
+            try {
+                const response = await fetch('https://api.hyperbolic.xyz/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer YOUR_AI_API_KEY'
+                    },
+                    body: JSON.stringify({
+                        model: 'meta-llama/Llama-3.2-3B-Instruct',
+                        messages: [{ role: 'user', content: prompt }],
+                        max_tokens: 1024,
+                        temperature: 0.7,
+                    })
+                });
+                const data = await response.json();
+                return data.choices[0]?.message?.content || 'No response from AI.';
+            } catch (error) {
+                console.error('Error querying AI:', error);
+                return 'Error fetching data.';
+            } finally {
+                this.hideLoading();
+            }
+        }
+    
+        async queryImage(prompt) {
+            this.showLoading();
+            try {
+                const response = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer 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',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ inputs: prompt })
+                });
+                const blob = await response.blob();
+                return URL.createObjectURL(blob);
+            } catch (error) {
+                console.error('Error generating image:', error);
+                return '';
+            } finally {
+                this.hideLoading();
+            }
+        }
+    
+        async queryGoogleImages(query) {
+            this.showLoading();
+            try {
+                const apiKey = 'YOUR_GOOGLE_API_KEY';
+                const searchEngineId = '02a1dc0d591e34974';
+                const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&q=${encodeURIComponent(query)}&searchType=image`;
+                
+                const response = await fetch(searchUrl);
+                const data = await response.json();
+                return data.items?.slice(0, 3).map(item => item.link) || [];
+            } catch (error) {
+                console.error('Error fetching Google images:', error);
+                return [];
+            } finally {
+                this.hideLoading();
+            }
+        }
+    
+        showLoading() {
+            this.loadingOverlay.classList.remove('hidden');
+        }
+    
+        hideLoading() {
+            this.loadingOverlay.classList.add('hidden');
+        }
+    
+        // Room management methods (to be implemented)
+        async createRoom() {
+            // Implementation coming in Part 3
+            console.log('Creating room...');
+        }
+    
+        async joinRoom() {
+            // Implementation coming in Part 3
+            console.log('Joining room...');
+        }
+    
+        async handleSendMessage() {
+            // Implementation coming in Part 3
+            console.log('Sending message...');
+        }
+    }
+    
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        const app = new QuantumChatAI();
+    });
+    </script>
+    
+</body>
+</html>
